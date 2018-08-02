@@ -37,7 +37,11 @@ def grab_ssh_version(ip, port=22):
     print("Connecting to %s on port %s" % (ip, port))
     s = socket.socket()
     s.settimeout(5)
-    s.connect((ip, port))
+    try:
+        s.connect((ip, port))
+    except socket.error:
+        print(ip, "timed out")
+        return
 
     data = s.recv(2048)
     s.shutdown(socket.SHUT_WR)
