@@ -5,6 +5,8 @@ import socket
 import re
 import traceback
 
+from .__init__ import __version__
+
 # e.g. SSH-1.99-OpenSSH_5.1
 #      SSH-2.0-dropbear_2013.62
 
@@ -58,6 +60,7 @@ def main():
     parser = argparse.ArgumentParser(description='Outputs the SSH banner of a remote host')
     parser.add_argument('hosts', metavar='hostname', type=str, nargs='+',
                         help='hostnames to check')
+    parser.add_argument('-v', '--version', action='version', version="sshbl %s" % __version__)
     args = parser.parse_args()
 
     # We can use a with statement to ensure threads are cleaned up promptly
