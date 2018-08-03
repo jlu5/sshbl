@@ -54,11 +54,15 @@ MAX_THREADS = 5
 
 def main():
     import concurrent.futures
-    ips = sys.argv[1]
+    import argparse
+    parser = argparse.ArgumentParser(description='Outputs the SSH banner of a remote host')
+    parser.add_argument('hosts', metavar='hostname', type=str, nargs='+',
+                        help='hostnames to check')
+    args = parser.parse_args()
 
     # We can use a with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
-        for result in executor.map(grab_ssh_version, ips, timeout=None, chunksize=1):
+        for result in executor.map(grab_ssh_version, args.hosts, timeout=None, chunksize=1):
             print(result)
 
 if __name__ == '__main__':
