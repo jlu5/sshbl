@@ -3,7 +3,7 @@ import unittest
 import inspect
 import logging
 
-from .bannergrabber import *
+from sshbl.bannergrabber import *
 
 class BannerGrabberTest(unittest.TestCase):
 
