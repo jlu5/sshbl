@@ -52,12 +52,15 @@ def grab_ssh_version(ip, port=22):
 
 MAX_THREADS = 5
 
-if __name__ == '__main__':
+def main():
     import concurrent.futures
-
-    ips = sys.argv[1:]
+    ips = sys.argv[1]
 
     # We can use a with statement to ensure threads are cleaned up promptly
     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
         for result in executor.map(grab_ssh_version, ips, timeout=None, chunksize=1):
             print(result)
+
+if __name__ == '__main__':
+    main()
+

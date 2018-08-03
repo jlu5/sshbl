@@ -1,10 +1,11 @@
+#!/usr/bin/env python3
 import unittest
 import inspect
 import logging
 
-from sshbl import *
+from .bannergrabber import *
 
-class SSHBLTest(unittest.TestCase):
+class BannerGrabberTest(unittest.TestCase):
 
     def assertSSHEqual(self, data, sshversion, product, version):
         result_tuple = parse_ssh_version(inspect.stack()[1][3], '', data)
