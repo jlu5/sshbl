@@ -8,11 +8,11 @@ from sshbl.sshbl import *
 class SSHBLTest(unittest.TestCase):
     def assertBlacklisted(self, data, threshold=0):
         result_tuple = parse_ssh_version(inspect.stack()[1][3], '', data)
-        self.assertTrue(is_blacklisted_version(result_tuple, threshold=threshold))
+        self.assertTrue(is_blacklisted_version(result_tuple, threshold=threshold)[0])
 
     def assertNotBlacklisted(self, data, threshold=0):
         result_tuple = parse_ssh_version(inspect.stack()[1][3], '', data)
-        self.assertFalse(is_blacklisted_version(result_tuple, threshold=threshold))
+        self.assertFalse(is_blacklisted_version(result_tuple, threshold=threshold)[0])
 
     def testDropbear(self):
         self.assertBlacklisted(b'SSH-2.0-dropbear_0.52\r\n')
