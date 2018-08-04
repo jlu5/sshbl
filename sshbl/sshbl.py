@@ -77,13 +77,9 @@ def scan(ip, port=22):
     return (ip, port, *is_blacklisted_version(version_tuple))
 
 def main():
-    import concurrent.futures
     args = parse_args('Checks whether the SSH daemons on remote hosts should be blacklisted')
-
-    log.info("Using up to %s threads", args.max_threads)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.max_threads) as executor:
-        for result in executor.map(scan, args.hosts, chunksize=1):
-            print("Is %s:%s blacklisted? %s (score: %d)" % result)
+    for result in run_threads(scan, args.hosts, args.max_threads):
+        print("Is %s:%s blacklisted? %s (score: %d)" % result)
 
 if __name__ == '__main__':
     main()

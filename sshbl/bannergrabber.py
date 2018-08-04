@@ -52,13 +52,9 @@ def grab_ssh_version(ip, port=22):
     return parse_ssh_version(ip, port, data)
 
 def main():
-    import concurrent.futures
     args = parse_args('Outputs the SSH banner of a remote host')
-
-    log.info("Using up to %s threads", args.max_threads)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.max_threads) as executor:
-        for result in executor.map(grab_ssh_version, args.hosts, chunksize=1):
-            print(result)
+    for result in run_threads(grab_ssh_version, args.hosts, args.max_threads):
+        print(result)
 
 if __name__ == '__main__':
     main()

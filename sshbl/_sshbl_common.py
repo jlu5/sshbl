@@ -1,4 +1,5 @@
 import logging
+import concurrent.futures
 from .__init__ import __version__
 
 logging.basicConfig()
@@ -21,3 +22,8 @@ def parse_args(description):
 
     return args
 
+def run_threads(func, hosts, max_threads):
+    log.info("Using up to %s threads", max_threads)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_threads) as executor:
+        for result in executor.map(func, hosts, chunksize=1):
+            yield result
