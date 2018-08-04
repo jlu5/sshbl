@@ -19,5 +19,6 @@ setup(name='sshbl',
      packages=['sshbl'],
      entry_points={'console_scripts': [
         'bannergrabber = sshbl.bannergrabber:main',
+        'sshbl = sshbl.sshbl:main',
          ]}
 )

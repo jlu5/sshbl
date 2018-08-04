@@ -5,7 +5,7 @@ import socket
 import re
 import traceback
 
-from .__init__ import __version__
+from . import _sshbl_common
 
 # e.g. SSH-1.99-OpenSSH_5.1
 #      SSH-2.0-dropbear_2013.62
@@ -52,19 +52,12 @@ def grab_ssh_version(ip, port=22):
 
     return parse_ssh_version(ip, port, data)
 
-MAX_THREADS = 5
-
 def main():
     import concurrent.futures
-    import argparse
-    parser = argparse.ArgumentParser(description='Outputs the SSH banner of a remote host')
-    parser.add_argument('hosts', metavar='hostname', type=str, nargs='+',
-                        help='hostnames to check')
-    parser.add_argument('-v', '--version', action='version', version="sshbl %s" % __version__)
-    args = parser.parse_args()
+    args = _sshbl_common.parse_args('Outputs the SSH banner of a remote host')
 
-    # We can use a with statement to ensure threads are cleaned up promptly
-    with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+    print("Using up to %s threads" % args.max_threads)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.max_threads) as executor:
         for result in executor.map(grab_ssh_version, args.hosts, timeout=None, chunksize=1):
             print(result)
 
