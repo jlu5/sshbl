@@ -5,7 +5,7 @@ import socket
 import re
 import traceback
 
-from . import _sshbl_common
+from ._sshbl_common import *
 
 # e.g. SSH-1.99-OpenSSH_5.1
 #      SSH-2.0-dropbear_2013.62
@@ -23,8 +23,7 @@ def parse_ssh_version(ip, port, data):
     try:
         firstline = firstline.decode()
     except ValueError:
-        traceback.print_exc()
-        return
+        log.exception("Failed to decode SSH banner")
 
     match = SSH_BANNER_REGEX.match(firstline)
 
@@ -36,29 +35,29 @@ def grab_ssh_version(ip, port=22):
     """
     Grabs SSH version from an IP and port.
     """
-    print("Connecting to %s on port %s" % (ip, port))
+    log.info("Connecting to %s on port %s", ip, port)
     s = socket.socket()
     s.settimeout(5)
     try:
         s.connect((ip, port))
     except socket.error:
-        print(ip, "timed out")
+        log.info("%s timed out", ip)
         return
 
     data = s.recv(2048)
     s.shutdown(socket.SHUT_WR)
     s.close()
-    print(ip, data)
+    log.debug("%s got raw data %s", ip, data)
 
     return parse_ssh_version(ip, port, data)
 
 def main():
     import concurrent.futures
-    args = _sshbl_common.parse_args('Outputs the SSH banner of a remote host')
+    args = parse_args('Outputs the SSH banner of a remote host')
 
-    print("Using up to %s threads" % args.max_threads)
+    log.info("Using up to %s threads", args.max_threads)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.max_threads) as executor:
-        for result in executor.map(grab_ssh_version, args.hosts, timeout=None, chunksize=1):
+        for result in executor.map(grab_ssh_version, args.hosts, chunksize=1):
             print(result)
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ import functools
 from pkg_resources import parse_version
 
 from .bannergrabber import *
-from . import _sshbl_common
+from ._sshbl_common import *
 
 # Fills in all comparison functions automatically given __eq__ and one of __lt__, __le__, __gt__, __ge__
 @functools.total_ordering
@@ -59,6 +59,7 @@ def blacklist_score(version_tuple):
 
     # TODO: check for common OpenSSH versions on abused hosts
 
+    log.debug('%s got score %s', str(version_tuple), score)
     return score
 
 def is_blacklisted_version(version_tuple, threshold=0):
@@ -66,24 +67,23 @@ def is_blacklisted_version(version_tuple, threshold=0):
     Returns whether the blacklist score for the version tuple is < than the threshold.
     """
     score = blacklist_score(version_tuple)
-    print(version_tuple, "score:", score)
-    return score < threshold
+    return (score < threshold, score)
 
 def scan(ip, port=22):
     """
     Scans a hostname and port and returns a blacklist score.
     """
     version_tuple = grab_ssh_version(ip, port)
-    return (ip, port, is_blacklisted_version(version_tuple))
+    return (ip, port, *is_blacklisted_version(version_tuple))
 
 def main():
     import concurrent.futures
-    args = _sshbl_common.parse_args('Checks whether the SSH daemons on remote hosts should be blacklisted')
+    args = parse_args('Checks whether the SSH daemons on remote hosts should be blacklisted')
 
-    print("Using up to %s threads" % args.max_threads)
+    log.info("Using up to %s threads", args.max_threads)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.max_threads) as executor:
-        for result in executor.map(scan, args.hosts, timeout=None, chunksize=1):
-            print("Is %s:%s blacklisted? %s" % result)
+        for result in executor.map(scan, args.hosts, chunksize=1):
+            print("Is %s:%s blacklisted? %s (score: %d)" % result)
 
 if __name__ == '__main__':
     main()
