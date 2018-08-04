@@ -35,6 +35,8 @@ def blacklist_score(version_tuple):
     c_sshversion = ComparableVersion(sshversion)
     if version is None:
         version = ''
+    if product is None:
+        product = ''
     c_version = ComparableVersion(version)
 
     score = 0
