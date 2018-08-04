@@ -40,7 +40,7 @@ def grab_ssh_version(ip, port=22, timeout=5):
         s = socket.create_connection((ip, port), timeout=timeout)
         data = s.recv(2048)
     except (socket.error, socket.timeout):
-        log.info("%s timed out", ip)
+        log.info("%s errored or timed out", ip, exc_info=True)
         return
 
     s.shutdown(socket.SHUT_WR)
