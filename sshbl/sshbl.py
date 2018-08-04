@@ -69,11 +69,11 @@ def is_blacklisted_version(version_tuple, threshold=0):
     score = blacklist_score(version_tuple)
     return (score < threshold, score)
 
-def scan(ip, port=22):
+def scan(ip, port=22, timeout=5):
     """
     Scans a hostname and port and returns a blacklist score.
     """
-    version_tuple = grab_ssh_version(ip, port)
+    version_tuple = grab_ssh_version(ip, port, timeout=timeout)
     return (ip, port, *is_blacklisted_version(version_tuple))
 
 def main():

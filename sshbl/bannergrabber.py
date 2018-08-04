@@ -31,20 +31,20 @@ def parse_ssh_version(ip, port, data):
         return (ip, port, firstline, None, None)
     return (ip, port, *match.groups())
 
-def grab_ssh_version(ip, port=22):
+def grab_ssh_version(ip, port=22, timeout=5):
     """
     Grabs SSH version from an IP and port.
     """
     log.info("Connecting to %s on port %s", ip, port)
     s = socket.socket()
-    s.settimeout(5)
+    s.settimeout(timeout)
     try:
         s.connect((ip, port))
-    except socket.error:
+        data = s.recv(2048)
+    except (socket.error, socket.timeout):
         log.info("%s timed out", ip)
         return
 
-    data = s.recv(2048)
     s.shutdown(socket.SHUT_WR)
     s.close()
     log.debug("%s got raw data %s", ip, data)
