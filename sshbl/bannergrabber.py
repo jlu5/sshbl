@@ -36,10 +36,8 @@ def grab_ssh_version(ip, port=22, timeout=5):
     Grabs SSH version from an IP and port.
     """
     log.info("Connecting to %s on port %s", ip, port)
-    s = socket.socket()
-    s.settimeout(timeout)
     try:
-        s.connect((ip, port))
+        s = socket.create_connection((ip, port), timeout=timeout)
         data = s.recv(2048)
     except (socket.error, socket.timeout):
         log.info("%s timed out", ip)
