@@ -6,13 +6,13 @@ import logging
 from sshbl.sshbl import *
 
 class SSHBLTest(unittest.TestCase):
-    def assertBlacklisted(self, data):
+    def assertBlacklisted(self, data, threshold=0):
         result_tuple = parse_ssh_version(inspect.stack()[1][3], '', data)
-        self.assertTrue(is_blacklisted_version(result_tuple))
+        self.assertTrue(is_blacklisted_version(result_tuple, threshold=threshold))
 
-    def assertNotBlacklisted(self, data):
+    def assertNotBlacklisted(self, data, threshold=0):
         result_tuple = parse_ssh_version(inspect.stack()[1][3], '', data)
-        self.assertFalse(is_blacklisted_version(result_tuple))
+        self.assertFalse(is_blacklisted_version(result_tuple, threshold=threshold))
 
     def testDropbear(self):
         self.assertBlacklisted(b'SSH-2.0-dropbear_0.52\r\n')
@@ -48,6 +48,14 @@ class SSHBLTest(unittest.TestCase):
         self.assertNotBlacklisted(b'SSH-2.0-1x1x-1.4\n')
         self.assertNotBlacklisted(b'SSH-2.0-2x2x-0.12\n')
         self.assertNotBlacklisted(b'SSH-2.0-testtttt_1.0.2050\n')
+
+    def testThreshold(self):
+        self.assertBlacklisted(b'SSH-2.0-dropbear_0.52\r\n', threshold=-10)
+        self.assertNotBlacklisted(b'SSH-2.0-dropbear_0.52\r\n', threshold=-30)
+        self.assertNotBlacklisted(b'SSH-2.0-dropbear_0.52\r\n', threshold=-500)
+        self.assertBlacklisted(b'SSH-2.0-ROSSSH\r\n', threshold=0)
+        self.assertNotBlacklisted(b'SSH-2.0-ROSSSH\r\n', threshold=-5)
+        self.assertNotBlacklisted(b'SSH-2.0-ROSSSH\r\n', threshold=-10)
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
